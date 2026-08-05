@@ -1,0 +1,13 @@
+# GitForge AI Engineer — Backend Dependencies
+# Python 3.12 required
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# Configuration
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# Structured logging
+python-json-logger==3.2.1

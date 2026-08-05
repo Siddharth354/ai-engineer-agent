@@ -11,3 +11,4 @@ python-dotenv==1.0.1
 
 # Structured logging
 python-json-logger==3.2.1
+GitPython==3.1.43

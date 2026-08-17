@@ -15,9 +15,13 @@ class CodeSearchService:
         self,
         query: str,
         top_k: int = 5,
+        distance_threshold: float = 1.2,
     ) -> list[dict]:
         """
         Search the repository for code relevant to a natural-language query.
+
+        Results with a distance greater than the configured threshold
+        are filtered out.
         """
 
         if not query.strip():
@@ -43,6 +47,10 @@ class CodeSearchService:
             metadatas,
             distances,
         ):
+            # Ignore results that are not sufficiently relevant
+            if distance > distance_threshold:
+                continue
+
             search_results.append(
                 {
                     "file_path": metadata["file_path"],

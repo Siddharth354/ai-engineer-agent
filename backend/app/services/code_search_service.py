@@ -15,13 +15,13 @@ class CodeSearchService:
         self,
         query: str,
         top_k: int = 5,
-        distance_threshold: float = 1.2,
+        distance_threshold: float | None = None,
     ) -> list[dict]:
         """
         Search the repository for code relevant to a natural-language query.
 
-        Results with a distance greater than the configured threshold
-        are filtered out.
+        If distance_threshold is provided, results above that distance
+        are filtered out. Otherwise, the top_k results are returned.
         """
 
         if not query.strip():
@@ -47,8 +47,11 @@ class CodeSearchService:
             metadatas,
             distances,
         ):
-            # Ignore results that are not sufficiently relevant
-            if distance > distance_threshold:
+            # Only apply threshold when explicitly provided
+            if (
+                distance_threshold is not None
+                and distance > distance_threshold
+            ):
                 continue
 
             search_results.append(

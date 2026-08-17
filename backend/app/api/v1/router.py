@@ -1,7 +1,9 @@
+"""Aggregates all API v1 route modules."""
+
 from fastapi import APIRouter
 
+from app.api.v1.endpoints import analysis
 from app.api.v1.endpoints import health
-from app.api.v1.endpoints import search
 
 
 api_router = APIRouter()
@@ -9,5 +11,5 @@ api_router = APIRouter()
 # Infrastructure
 api_router.include_router(health.router)
 
-# Semantic code search
-api_router.include_router(search.router)
+# AI code analysis
+api_router.include_router(analysis.router)

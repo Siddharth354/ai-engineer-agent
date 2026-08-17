@@ -5,21 +5,11 @@ from app.core.config import settings
 
 class LLMService:
     """
-    Service responsible for interacting with the LLM.
+    Service responsible for generating AI responses using Groq.
     """
 
     def __init__(self):
-        if not settings.groq_api_key:
-            raise ValueError(
-                "GROQ_API_KEY is not configured. "
-                "Add it to the backend .env file."
-            )
-
-        self.client = Groq(
-            api_key=settings.groq_api_key
-        )
-
-        self.model = settings.groq_model
+        self.client = Groq(api_key=settings.groq_api_key)
 
     def analyze_code(
         self,
@@ -27,46 +17,60 @@ class LLMService:
         code_context: str,
     ) -> str:
         """
-        Analyze retrieved repository code and answer the user's question.
+        Analyze repository code using the retrieved code context.
         """
 
         system_prompt = """
-You are GitForge AI Engineer, an AI software engineering assistant.
+You are GitForge AI Engineer, an AI assistant specialized in
+understanding and analyzing software repositories.
 
-You analyze source code from a repository and answer questions
-using the provided code context.
+Your job is to answer questions about the user's repository
+using ONLY the provided repository code context.
 
 Rules:
-1. Base your answer primarily on the provided code.
-2. Do not invent files, functions, or behavior that are not present.
-3. Explain your reasoning clearly.
-4. Mention relevant file paths when useful.
-5. If the provided context is insufficient, say so.
+
+1. Base your answer on the retrieved repository code.
+2. Do not invent files, functions, variables, or behavior.
+3. Clearly mention the relevant file paths when explaining code.
+4. Explain what the EXISTING code does before discussing improvements.
+5. Do not rewrite or propose replacement code unless the user
+   explicitly asks for a fix, refactoring, or implementation.
+6. If the existing code contains a bug or incorrect logic, clearly
+   state that the repository implementation is incorrect.
+7. Distinguish between:
+   - What the repository currently does
+   - Problems or limitations in that implementation
+   - Suggested improvements, only when requested
+8. If the retrieved context does not contain enough information,
+   say that the available repository context is insufficient.
+9. Keep the answer technical but easy to understand.
 """
 
         user_prompt = f"""
-User question:
-{question}
-
 Repository code context:
+
 {code_context}
 
-Analyze the provided code and answer the user's question.
+User question:
+
+{question}
+
+Answer the question based strictly on the repository context above.
 """
 
         response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt,
-                },
-                {
-                    "role": "user",
-                    "content": user_prompt,
-                },
-            ],
-            temperature=0.2,
-        )
+    model=settings.groq_model,
+    messages=[
+        {
+            "role": "system",
+            "content": system_prompt,
+        },
+        {
+            "role": "user",
+            "content": user_prompt,
+        },
+    ],
+    temperature=0.1,
+)
 
-        return response.choices[0].message.content or ""
+        return response.choices[0].message.content

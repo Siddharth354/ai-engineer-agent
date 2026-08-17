@@ -28,8 +28,11 @@ class Settings(BaseSettings):
     port: int = 8000
     api_v1_prefix: str = "/api/v1"
     # API
-    groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_api_key: str = Field(
+    ...,
+    description="Groq API key",
+)
+    groq_model: str = "openai/gpt-oss-120b"
 
     # CORS
     cors_origins: list[str] = Field(

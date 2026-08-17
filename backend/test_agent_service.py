@@ -1,17 +1,16 @@
 from app.services.agent_service import AgentService
 
 
-agent = AgentService()
+print("\n===== AI ENGINEER AGENT =====\n")
 
-question = """
-What is the overall purpose of this repository?
-What are the main types of projects it contains?
-"""
+question = input("Enter your question: ")
+
+agent = AgentService()
 
 answer = agent.analyze_repository(
     question=question,
     top_k=8,
 )
 
-print("\n===== AI ENGINEER AGENT =====\n")
+print("\n===== ANSWER =====\n")
 print(answer)

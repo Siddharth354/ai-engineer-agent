@@ -36,7 +36,7 @@ class VectorStore:
         documents_text = []
         metadatas = []
 
-        for index, document in enumerate(documents):
+        for document in documents:
             file_path = document["file_path"]
             chunk_index = document["chunk_index"]
 
@@ -44,7 +44,9 @@ class VectorStore:
 
             ids.append(document_id)
 
-            embeddings.append(document["embedding"])
+            embeddings.append(
+                document["embedding"]
+            )
 
             documents_text.append(
                 document["content"]
@@ -68,7 +70,10 @@ class VectorStore:
         return len(documents)
 
     def count(self) -> int:
-        """Return the number of stored code chunks."""
+        """
+        Return the number of stored code chunks.
+        """
+
         return self.collection.count()
 
     def search(
@@ -80,7 +85,26 @@ class VectorStore:
         Search for the most relevant code chunks.
         """
 
+        # Keep retrieval size under control.
+        top_k = max(1, min(top_k, 20))
+
+        collection_count = self.collection.count()
+
+        if collection_count == 0:
+            return {
+                "documents": [[]],
+                "metadatas": [[]],
+                "distances": [[]],
+            }
+
+        top_k = min(top_k, collection_count)
+
         return self.collection.query(
             query_embeddings=[query_embedding],
             n_results=top_k,
+            include=[
+                "documents",
+                "metadatas",
+                "distances",
+            ],
         )
